@@ -1,4 +1,5 @@
 import { authenticateUser } from "../middleware/authMiddleware.js";
+import bcrypt from 'bcrypt';
 import { Users } from "../models/user.model.js";
 
 export const getUsers = [
@@ -20,24 +21,52 @@ export const getUsers = [
 export const addUser = async (req, res) => {
   try {
     const userInfo = req.body;
-    console.log(userInfo);
+
+    // Check if the password is provided
+    if (!userInfo.password) {
+      return res.status(400).json({
+        status: 'error',
+        status_code: 400,
+        message: 'Password is required',
+      });
+    }
+
+    // Hash the password using bcrypt (saltRounds = 10)
+    const hashedPassword = await bcrypt.hash(userInfo.password, 10);
+
+    // Replace the plain password with the hashed password in userInfo
+    userInfo.password = hashedPassword;
+
+    // Create a new user document with the hashed password
     const newUser = new Users(userInfo);
+
+    // Save the new user to the database
     const result = await newUser.save();
 
+    // Respond with success
     res.status(200).json({
-      status: "success",
+      status: 'success',
       status_code: 200,
-      message: "User created successfully",
+      message: 'User created successfully',
+      data: {
+        name: result.name,
+        email: result.email,
+        photoUrl: result.photoUrl,
+        accessLevel: result.accessLevel,
+        createdAt: result.createdAt,
+      },
     });
   } catch (error) {
+    // Handle errors
     res.status(500).json({
-      status: "error",
+      status: 'error',
       status_code: 500,
-      message: error?.message || "Internal Server Error",
+      message: error?.message || 'Internal Server Error',
       error: error,
     });
   }
 };
+
 
 export const login = async (req, res) => {
 
