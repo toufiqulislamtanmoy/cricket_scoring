@@ -2,7 +2,7 @@ import { authenticateUser } from "../middleware/authMiddleware.js";
 import { Users } from "../models/user.model.js";
 
 export const getUsers = [
-  authenticateUser,
+  // authenticateUser,
   async (req, res) => {
     try {
       const users = await Users.find();
