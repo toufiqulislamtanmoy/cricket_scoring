@@ -6,6 +6,9 @@ const dev = {
     },
     db: {
         mongoURI: process.env.MONGO_URI
+    },
+    secret:{
+        jwtSecret: process.env.JWT_SECRET
     }
 }
 

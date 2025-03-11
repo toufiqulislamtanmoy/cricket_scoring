@@ -1,13 +1,21 @@
+import { authenticateUser } from "../middleware/authMiddleware.js";
 import { Users } from "../models/user.model.js";
 
-export const getUsers = async (req, res) => {
-  try {
-    const users = await Users.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).send(error?.message);
+export const getUsers = [
+  authenticateUser,
+  async (req, res) => {
+    try {
+      const users = await Users.find();
+      res.status(200).json({
+        status: "success",
+        message: "User fetch successfully",
+        users: users,
+      });
+    } catch (error) {
+      res.status(500).send(error?.message);
+    }
   }
-};
+];
 
 export const addUser = async (req, res) => {
   try {
@@ -15,9 +23,18 @@ export const addUser = async (req, res) => {
     console.log(userInfo);
     const newUser = new Users(userInfo);
     const result = await newUser.save();
-    console.log("result--------->", result);
-    res.status(200).json(result);
+
+    res.status(200).json({
+      status: "success",
+      status_code: 200,
+      message: "User created successfully",
+    });
   } catch (error) {
-    res.status(500).send(error?.message);
+    res.status(500).json({
+      status: "error",
+      status_code: 500,
+      message: error?.message || "Internal Server Error",
+      error: error,
+    });
   }
 };
