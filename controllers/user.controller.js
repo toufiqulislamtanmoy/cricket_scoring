@@ -38,3 +38,37 @@ export const addUser = async (req, res) => {
     });
   }
 };
+
+export const login = async (req, res) => {
+
+  const { email, password } = req.body;
+
+  try {
+    // Find user by email
+    const user = await Users.findOne({ email });
+
+    // If user doesn't exist, return error
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    // Compare passwords (assuming hashed passwords in your database)
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.comparePassword(password);
+
+    if (isPasswordValid) {
+      // Return user data (avoid sending password in the response)
+      res.json({
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name, // Include any other user details you want
+        },
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+}
