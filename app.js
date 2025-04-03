@@ -4,7 +4,7 @@ import { dbConnection } from "./config/dbConnection.js";
 import userRouter from "./routes/user.route.js";
 import tournamentRouter from "./routes/tournament.route.js"
 import teamRouter from "./routes/team.route.js"
-
+import playerRouter from "./routes/player.route.js"
 const app = express();
 
 app.use(cors());
@@ -19,6 +19,7 @@ app.get("/", async (req, res) => {
 app.use("/api", userRouter);
 app.use("/api", tournamentRouter);
 app.use("/api", teamRouter);
+app.use("/api", playerRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({
